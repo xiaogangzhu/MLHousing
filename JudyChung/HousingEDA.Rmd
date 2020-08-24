@@ -8,6 +8,7 @@ output: html_notebook
 ```{r}
 library(mice)
 library(dplyr)
+library(ggplot2)
 ```
 ```{r}
 raw=read.csv('data/Ames_Housing_Price_Data.csv')[,-1]
@@ -29,6 +30,7 @@ unique(raw$FireplaceQu)
 ```
 
 
+
 ```{r}
 raw_sub= select(raw, 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF', 
                 'TotalBsmtSF', 'GarageCars', 'GarageArea', 
@@ -37,5 +39,43 @@ raw_sub= select(raw, 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF',
 ```
 ```{r}
 mice::md.pattern(raw_sub, rotate.names=TRUE)
+```
+```{r}
+raw_tlog = raw
+raw_tlog[, 3] = log(raw[3], 2)
+raw_tlog$GrLivArea = log(raw$GrLivArea)
+```
+
+```{r}
+
+```
+
+
+```{r}
+raw_tlog%>% 
+  ggplot(aes(x=GrLivArea, y=SalePrice)) +
+  geom_point(aes(color = HouseStyle ))
+```
+```{r}
+raw_tlog%>% 
+  ggplot(aes(x=GrLivArea, y=SalePrice)) +
+  geom_point(aes(color = BsmtQual))
+```
+```{r}
+raw_tlog%>% 
+  ggplot(aes(x=GrLivArea, y=SalePrice)) +
+  geom_point(aes(color = YearBuilt))
+```
+```{r}
+raw%>% 
+  ggplot(aes(x=GrLivArea, y=SalePrice)) +
+  geom_point(aes(color =KitchenQual))
+```
+
+
+```{r}
+(10^2.085)
+
+10^1.47067899
 ```
 
