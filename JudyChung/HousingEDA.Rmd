@@ -11,13 +11,23 @@ library(dplyr)
 library(ggplot2)
 ```
 ```{r}
+# Read in raw data
 raw=read.csv('data/Ames_Housing_Price_Data.csv')[,-1]
 ```
 ```{r}
+summary(raw)
 head(raw)
 ```
 ```{r}
+# Read in categorical variables as empty strings instead of NA
+unique(raw$FireplaceQu)
+# Change to NA
 raw[raw=='']=NA
+```
+
+
+```{r}
+# Remove Misc Features
 rawd = select(raw,-MiscFeature)
 ```
 
@@ -25,57 +35,186 @@ rawd = select(raw,-MiscFeature)
 ```{r}
 mice::md.pattern(rawd, rotate.names=TRUE)
 ```
-```{r}
-unique(raw$FireplaceQu)
-```
 
 
 
 ```{r}
-raw_sub= select(raw, 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF', 
-                'TotalBsmtSF', 'GarageCars', 'GarageArea', 
-                'BsmtFullBath', 'BsmtHalfBath', 'MasVnrArea', 
-                'GarageYrBlt', 'LotFrontage')
-```
-```{r}
-mice::md.pattern(raw_sub, rotate.names=TRUE)
-```
-```{r}
+# log trasform Target and GrLivArea
 raw_tlog = raw
 raw_tlog[, 3] = log(raw[3], 2)
 raw_tlog$GrLivArea = log(raw$GrLivArea)
 ```
 
+## Mapping different categorical variables to Saleprice to GrLivArea
 ```{r}
-
-```
-
-
-```{r}
+# House styles like floors
 raw_tlog%>% 
   ggplot(aes(x=GrLivArea, y=SalePrice)) +
   geom_point(aes(color = HouseStyle ))
 ```
 ```{r}
+# Basement quality
 raw_tlog%>% 
   ggplot(aes(x=GrLivArea, y=SalePrice)) +
   geom_point(aes(color = BsmtQual))
 ```
 ```{r}
+# year - need to calculate age
 raw_tlog%>% 
   ggplot(aes(x=GrLivArea, y=SalePrice)) +
   geom_point(aes(color = YearBuilt))
 ```
 ```{r}
+# Kitchen quality
 raw%>% 
   ggplot(aes(x=GrLivArea, y=SalePrice)) +
   geom_point(aes(color =KitchenQual))
 ```
 
-
+# Exploring Aikos question
 ```{r}
 (10^2.085)
 
+```
+
+```{r}
 10^1.47067899
+```
+
+### Trying stepwise AIC, BIC
+```{r}
+df=read.csv('data/cleanforRd.csv')
+```
+
+```{r}
+#summary(df)
+head(df)
+```
+```{r}
+library(corrplot)
+```
+
+```{r}
+cor_mat = cor(df)
+corrplot(cor_mat, method="circle", type="lower")
+```
+
+```{r}
+# Creating a saturated model (i.e., with all variables included).
+model.saturated = lm(SalePrice ~ ., data = df)
+```
+
+```{r}
+summary(model.saturated)
+```
+
+```{r}
+library(car)
+vif(model.saturated)
+```
+
+```{r}
+model.empty = lm(SalePrice ~ 1, data = df) #The model with an intercept ONLY.
+scope = list(lower = formula(model.empty), upper = formula(model.saturated))
+
+backwardAIC = step(model.saturated, scope, direction = "backward", k = 2)
+# Step:  AIC=-28.16
+# Life.Exp ~ Population + Murder + HS.Grad + Frost
+```
+```{r}
+forwardAIC = step(model.empty, scope, direction = "forward", k = 2)
+```
+
+```{r}
+plot(forwardAIC)
+```
+```{r}
+backwardBIC = step(model.saturated, scope, direction = "backward", k = log(50))
+```
+
+
+
+```{r}
+forwardBIC = step(model.empty, scope, direction = "forward", k = log(50))
+```
+
+
+
+```{r}
+
+formula(backwardBIC)
+formula(forwardAIC)
+formula(forwardBIC)
+```
+```{r}
+plot(forwardBIC)
+```
+```{r}
+summary(forwardAIC)
+```
+
+
+```{r}
+vif(forwardBIC)
+```
+
+```{r}
+vif(forwardAIC)
+```
+
+#### LOG TRANSFORM TARGET
+
+```{r}
+head(df)
+df_log = df
+df_log$SalePrice = log(df$SalePrice)
+```
+```{r}
+# log price saturated model
+model.saturated.log = lm(SalePrice ~ ., data = df_log)
+```
+
+```{r}
+model.empty.log = lm(SalePrice ~ 1, data = df_log) #The model with an intercept ONLY.
+scope = list(lower = formula(model.empty.log), upper = formula(model.saturated.log))
+
+fowardBIClog = step(model.empty.log, scope, direction = "forward", k = log(50))
+```
+```{r}
+formula(fowardBIClog)
+```
+```{r}
+vif(fowardBIClog)
+```
+
+```{r}
+summary(fowardBIClog)
+```
+### Running BIC again with insights
+```{r}
+df_i=read.csv('data/cleanforR_i.csv', stringsAsFactors = TRUE)
+```
+
+```{r}
+head(df_i)
+```
+```{r}
+model.saturated.insights = lm(SalePrice ~ ., data = df_i)
+```
+
+```{r}
+model.empty.i = lm(SalePrice ~ 1, data = df_i) #The model with an intercept ONLY.
+scope = list(lower = formula(model.empty.i), upper = formula(model.saturated.insights))
+
+fowardBICi = step(model.empty.i, scope, direction = "forward", k = log(50))
+
+```
+
+
+```{r}
+formula(fowardBICi)
+```
+```{r}
+vif(fowardBICi)
 ```
 
