@@ -49,6 +49,7 @@ def clean_category_var(df):
     df.LandSlope = np.where(df.LandSlope == 'Gtl',"1","2")
     df.LotShape = np.where(df.LotShape == 'Reg',"1","2")
     df.MSZoning = np.where(df.MSZoning.isin(['RL','FV']),"1","2")
+    df['1st2ndlogSF'] = np.log(df['1stFlrSF'] + df['2ndFlrSF'])
     df['HouseAge'] = df.YrSold - df.YearBuilt
     df['RemodelAge'] = df.YrSold - df.YearRemodAdd
     df['HasPool'] = np.where(df['PoolArea']==0, 0, 1)
@@ -68,7 +69,8 @@ def clean_category_var(df):
                     'FullBath','ScreenPorch', 'EnclosedPorch','3SsnPorch','OpenPorchSF','PoolArea','PoolQC', 'YearRemodAdd',
                     'Fence','YearBuilt','YrSold','GarageYrBlt', 'GrLivArea', 'OverallQual', 'OverallCond', 'BsmtCond',
                     'ExterCond', 'BsmtFinSF1','BsmtFinSF2', 'BsmtUnfSF','LowQualFinSF', 'GarageCond', 'MSSubClass',
-                    'SaleCondition', 'Exterior1st', 'Utilities', 'Street']
+                    'SaleCondition', 'Exterior1st', 'Utilities', 'Street', '1stFlrSF',
+                    '2ndFlrSF']
     df = df.drop(drop_columns,axis=1)
     
     return df
