@@ -1,5 +1,5 @@
 
-def clean(df):
+def clean_missing(df):
     import pandas as pd
     import numpy as np
     select_column = ["BsmtFinSF1","BsmtFinSF2","BsmtUnfSF","TotalBsmtSF","BsmtHalfBath","BsmtFullBath", "MasVnrArea"]
@@ -72,7 +72,7 @@ def clean_category_var(df):
     df = df.drop(drop_columns,axis=1)
     
     return df
-    
+
     
 def final_model(df):
     import numpy as np
