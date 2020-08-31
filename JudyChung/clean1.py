@@ -56,33 +56,23 @@ def clean_category_var(df):
        'Blueste', 'Sawyer', 'Crawfor', 'SawyerW', 'Gilbert', 'NPkVill']), "Tier_2", "Tier_3"))
     
     #drop columns
-    drop_columns = ["Alley","BsmtFinType2","Condition2","Exterior2nd","Fence","Heating","LandContour","LotConfig","MiscFeature","MoSold","RoofMatl","RoofStyle","SaleType"]
+    drop_columns = ["Alley","BsmtFinType2","Condition2","Exterior2nd","Fence","Heating","LandContour","LotConfig",
+                    "MiscFeature","MoSold","RoofMatl","RoofStyle","SaleType"]
     df = df.drop(drop_columns,axis=1)
     
     return df
     
     
-def transform_age(df):
-    df['HouseAge'] = df.YrSold - df.YearBuilt
-    df['RemodelAge'] = df.YrSold - df.YearRemodAdd
-    
-    return df
-
-def j_model_clean(df):
-    import pandas as pd
+def final_model(df):
     import numpy as np
-    df['HouseAge'] = df.YrSold - df.YearBuilt
-    df['TotalArea'] = df['GrLivArea'] + df['TotalBsmtSF'] + df['GarageArea']
     df['TotalBath'] = df['HalfBath']/2 + df['BsmtFullBath'] + df['BsmtHalfBath']/2 + df['FullBath']
-    df['MultStory'] = np.where(df['HouseStyle']=='1Story', 0, 1)
     df['PartialSale'] = np.where(df['SaleCondition']=='Partial', 1, 0)
     df['PavedDrive'] = np.where(df['PavedDrive']=='Y', 1, 0)
     df['Neighborhood'] = np.where(df['Neighborhood'].isin(['GrnHill', 'Greens', 'NridgHt', 'StoneBr', 'Veenker', 'Somerst',
        'Timber', 'CollgCr', 'Blmngtn']), "Tier_1", np.where(df['Neighborhood'].isin(['Blmngtn', 'NoRidge', 'Mitchel', 'ClearCr',
        'Blueste', 'Sawyer', 'Crawfor', 'SawyerW', 'Gilbert', 'NPkVill']), "Tier_2", "Tier_3"))
-    column_names = ['TotalArea','Neighborhood','BldgType','ExterQual','BsmtQual','HeatingQC','CentralAir','BedroomAbvGr','KitchenQual','Fireplaces','GarageQual','PavedDrive','HouseAge','TotalBath', 'MultStory', 'PartialSale']
+    column_names = ['ExterQual','BsmtQual','KitchenQual','Fireplaces','GarageQual','PavedDrive',
+                    'TotalBath','PartialSale','TotalBsmtSF','1stFlrSF','2ndFlrSF','GarageArea','WoodDeckSF']
     df = df[column_names].copy()
-    df['TotalArea'] = np.log(df['TotalArea'].copy())
 
     return df
-    

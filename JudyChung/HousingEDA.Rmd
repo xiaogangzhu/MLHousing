@@ -217,4 +217,81 @@ formula(fowardBICi)
 ```{r}
 vif(fowardBICi)
 ```
+```{r}
+summary(fowardBICi)
+```
+```{r}
+plot(fowardBICi)
+```
+
+
+############################################################################
+After Talk 
+
+```{r}
+df_at=read.csv('data/rdata_at.csv')
+df_atl=read.csv('data/rdata_atl.csv')
+```
+
+```{r}
+#summary(df)
+head(df_atl)
+```
+
+
+
+```{r}
+# Creating a saturated model (i.e., with all variables included).
+model.sat.at = lm(SalePrice ~ ., data = df_at)
+model.sat.atl = lm(SalePrice ~ ., data = df_atl)
+```
+
+```{r}
+summary(model.sat.at)
+summary(model.sat.atl)
+```
+
+```{r}
+vif(model.sat.atl)
+```
+
+```{r}
+model.empty.at = lm(SalePrice ~ 1, data = df_at) #The model with an intercept ONLY.
+model.empty.atl = lm(SalePrice ~ 1, data = df_atl)
+
+scope_at = list(lower = formula(model.empty.at), upper = formula(model.sat.at))
+scope_atl = list(lower = formula(model.empty.atl), upper = formula(model.sat.atl))
+```
+
+
+```{r}
+forwardBIC_at = step(model.empty.at, scope_at, direction = "forward", k = log(50))
+```
+
+```{r}
+formula(forwardBIC_at)
+```
+
+```{r}
+forwardBIC_atl = step(model.empty.atl, scope_atl, direction = "forward", k = log(50))
+```
+
+```{r}
+formula(forwardBIC_atl)
+```
+
+
+```{r}
+summary(forwardBIC_at)
+summary(forwardBIC_atl)
+```
+
+```{r}
+plot(forwardBIC_at)
+plot(forwardBIC_atl)
+```
+```{r}
+vif(forwardBIC_at)
+vif(forwardBIC_atl)
+```
 
