@@ -1,0 +1,17 @@
+
+
+```{r}
+library(car)
+```
+
+## Read in cleaned data frame
+
+```{r}
+df=read.csv('data/rdata1.csv')
+head(df)
+```
+
+```{r}
+
+```
+
